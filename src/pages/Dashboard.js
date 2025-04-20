@@ -1,13 +1,24 @@
-// src/pages/Dashboard.js
-// Update the imports to include Link and Inventory
 import React, { useContext, useState } from 'react';
 import { Routes, Route, Link } from 'react-router-dom';
 import { Box, Typography, AppBar, Toolbar, IconButton, Drawer, List, ListItem, ListItemIcon, ListItemText, Divider } from '@mui/material';
-import { Menu as MenuIcon, Dashboard as DashboardIcon, Inventory as InventoryIcon, Receipt as ReceiptIcon, People as PeopleIcon, InsertChart as ChartIcon, ExitToApp as LogoutIcon } from '@mui/icons-material';
+import { 
+  Menu as MenuIcon, 
+  Dashboard as DashboardIcon, 
+  Inventory as InventoryIcon, 
+  Receipt as ReceiptIcon, 
+  People as PeopleIcon, 
+  InsertChart as ChartIcon, 
+  ExitToApp as LogoutIcon,
+  RestaurantMenu as RestaurantMenuIcon,
+  AdminPanelSettings as AdminIcon
+} from '@mui/icons-material';
 import { AuthContext } from '../context/AuthContext';
 import Inventory from './Inventory';
 import POSTerminal from './POSTerminal'; 
 import AnalyticsDashboard from './AnalyticsDashboard';
+import OrdersManagement from './OrdersManagement';
+import RecipeManagement from './RecipeManagement';
+import UserManagement from './UserManagement';
 
 const drawerWidth = 240;
 
@@ -35,6 +46,9 @@ const Dashboard = () => {
     setMobileOpen(!mobileOpen);
   };
 
+  // Check if user has admin or manager role for certain menu items
+  const isAdminOrManager = user?.role === 'admin' || user?.role === 'manager';
+
   const drawer = (
     <div>
       <Toolbar>
@@ -50,36 +64,57 @@ const Dashboard = () => {
           </ListItemIcon>
           <ListItemText primary="Dashboard" />
         </ListItem>
-        <ListItem button component={Link} to="/dashboard/inventory">
-          <ListItemIcon>
-            <InventoryIcon />
-          </ListItemIcon>
-          <ListItemText primary="Inventory" />
-        </ListItem>
-        <ListItem button component={Link} to="/dashboard/orders">
-          <ListItemIcon>
-            <ReceiptIcon />
-          </ListItemIcon>
-          <ListItemText primary="Orders" />
-        </ListItem>
-        <ListItem button component={Link} to="/dashboard/customers">
-          <ListItemIcon>
-            <PeopleIcon />
-          </ListItemIcon>
-          <ListItemText primary="Customers" />
-        </ListItem>
-        <ListItem button component={Link} to="/dashboard/analytics">
-          <ListItemIcon>
-            <ChartIcon />
-          </ListItemIcon>
-          <ListItemText primary="Analytics" />
-        </ListItem>
+        
         <ListItem button component={Link} to="/dashboard/pos">
           <ListItemIcon>
             <ReceiptIcon />
           </ListItemIcon>
           <ListItemText primary="POS Terminal" />
         </ListItem>
+        
+        <ListItem button component={Link} to="/dashboard/orders">
+          <ListItemIcon>
+            <ReceiptIcon />
+          </ListItemIcon>
+          <ListItemText primary="Orders" />
+        </ListItem>
+        
+        <ListItem button component={Link} to="/dashboard/inventory">
+          <ListItemIcon>
+            <InventoryIcon />
+          </ListItemIcon>
+          <ListItemText primary="Inventory" />
+        </ListItem>
+        
+        <ListItem button component={Link} to="/dashboard/recipes">
+          <ListItemIcon>
+            <RestaurantMenuIcon />
+          </ListItemIcon>
+          <ListItemText primary="Recipe Management" />
+        </ListItem>
+        
+        <ListItem button component={Link} to="/dashboard/customers">
+          <ListItemIcon>
+            <PeopleIcon />
+          </ListItemIcon>
+          <ListItemText primary="Customers" />
+        </ListItem>
+        
+        <ListItem button component={Link} to="/dashboard/analytics">
+          <ListItemIcon>
+            <ChartIcon />
+          </ListItemIcon>
+          <ListItemText primary="Analytics" />
+        </ListItem>
+        
+        {isAdminOrManager && (
+          <ListItem button component={Link} to="/dashboard/users">
+            <ListItemIcon>
+              <AdminIcon />
+            </ListItemIcon>
+            <ListItemText primary="User Management" />
+          </ListItem>
+        )}
       </List>
       <Divider />
       <List>
@@ -110,7 +145,7 @@ const Dashboard = () => {
             Smart POS System
           </Typography>
           <Typography variant="body1">
-            Welcome, {user?.email}
+            Welcome, {user?.firstName || user?.email} {user?.role ? `(${user.role})` : ''}
           </Typography>
         </Toolbar>
       </AppBar>
@@ -153,6 +188,9 @@ const Dashboard = () => {
           <Route path="/inventory" element={<Inventory />} />
           <Route path="/pos" element={<POSTerminal />} />
           <Route path="/analytics" element={<AnalyticsDashboard />} />
+          <Route path="/orders" element={<OrdersManagement />} />
+          <Route path="/recipes" element={<RecipeManagement />} />
+          {isAdminOrManager && <Route path="/users" element={<UserManagement />} />}
           {/* Add more routes for other features */}
         </Routes>
       </Box>
